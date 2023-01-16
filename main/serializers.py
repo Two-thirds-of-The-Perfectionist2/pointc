@@ -13,6 +13,10 @@ class OrganizationSerializer(ModelSerializer):
         attrs['user'] = request.user
         return attrs
 
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        return rep
+
 class ProductSerializer(ModelSerializer):
     class Meta:
         model = Product
