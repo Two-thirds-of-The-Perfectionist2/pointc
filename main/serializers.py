@@ -5,7 +5,13 @@ from .models import OrganizationCard, Products
 class OrganizationCardSerializer(ModelSerializer):
     class Meta:
         model = OrganizationCard
-        fields = '__all__'
+        exclude = ('user',)
+
+    def validate(self, attrs):
+        attrs =  super().validate(attrs)
+        request = self.context.get('request')
+        attrs['user'] = request.user
+        return attrs
 
 class ProductsSerializer(ModelSerializer):
     class Meta:
