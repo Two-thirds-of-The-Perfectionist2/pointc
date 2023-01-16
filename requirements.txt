@@ -7,6 +7,6 @@ djangorestframework
 djangorestframework-simplejwt
 drf-yasg
 pillow
+gunicorn
 celery
 redis
-gunicorn
