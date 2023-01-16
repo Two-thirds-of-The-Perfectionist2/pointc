@@ -1,13 +1,13 @@
 from rest_framework.viewsets import ModelViewSet
 
-from .models import OrganizationCard, Products
-from .serializers import OrganizationCardSerializer,ProductsSerializer
+from .models import Organization, Product
+from .serializers import OrganizationSerializer,ProductSerializer
 
-class OrginizationCardViewSet(ModelViewSet):
-    queryset = OrganizationCard.objects.all()
-    serializer_class = OrganizationCardSerializer
+class OrginizationViewSet(ModelViewSet):
+    queryset = Organization.objects.all()
+    serializer_class = OrganizationSerializer
 
 
-class ProductsViewSet(ModelViewSet):
-    queryset = Products.objects.all()
-    serializer_class = ProductsSerializer
+class ProductViewSet(ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer

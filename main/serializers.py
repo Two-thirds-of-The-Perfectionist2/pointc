@@ -1,20 +1,19 @@
 from rest_framework.serializers import ModelSerializer
 
-from .models import OrganizationCard, Products
+from .models import Organization, Product
 
-class OrganizationCardSerializer(ModelSerializer):
+class OrganizationSerializer(ModelSerializer):
     class Meta:
-        model = OrganizationCard
+        model = Organization
         exclude = ('user',)
 
     def validate(self, attrs):
         attrs =  super().validate(attrs)
         request = self.context.get('request')
         attrs['user'] = request.user
-        attrs['products'] = request.products
         return attrs
 
-class ProductsSerializer(ModelSerializer):
+class ProductSerializer(ModelSerializer):
     class Meta:
-        model = Products
+        model = Product
         fields = '__all__'
