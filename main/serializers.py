@@ -11,6 +11,7 @@ class OrganizationCardSerializer(ModelSerializer):
         attrs =  super().validate(attrs)
         request = self.context.get('request')
         attrs['user'] = request.user
+        attrs['products'] = request.products
         return attrs
 
 class ProductsSerializer(ModelSerializer):
