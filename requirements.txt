@@ -1,0 +1,12 @@
+django
+django-cors-headers
+django-filter
+psycopg2-binary
+python-decouple
+djangorestframework
+djangorestframework-simplejwt
+drf-yasg
+pillow
+celery
+redis
+gunicorn
