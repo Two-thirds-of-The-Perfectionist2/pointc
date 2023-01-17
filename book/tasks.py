@@ -4,7 +4,7 @@ from celery import shared_task
 
 @shared_task
 def send_activation_code(email, activation_code):
-    activation_link = f'http://localhost:8000/account/activate/{activation_code}/'
+    activation_link = f'http://34.134.203.27/account/activate/{activation_code}/'
     message = f"""
                Hello! Thank you for joined our family. \n  
 
