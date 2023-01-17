@@ -4,11 +4,14 @@ from rest_framework.response import Response
 
 from .models import Organization, Product
 from .serializers import OrganizationSerializer,ProductSerializer
+from .permissions import IsAuthorOrReadOnly
 
 class OrginizationViewSet(ModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
 
+    def get_permissions(self):
+        return [IsAuthorOrReadOnly()]
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
