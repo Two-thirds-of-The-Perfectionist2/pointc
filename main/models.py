@@ -6,17 +6,23 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
+class Organization(models.Model):
+    user = models.ForeignKey(User, related_name='users', on_delete=models.CASCADE)
+    title = models.CharField(max_length=50)
+    address = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=14)
+    category = models.CharField(max_length=20, choices=[('Еда', 'Food'), ('Товары', 'Merchandise'), ('Другое', 'Other')])
+    tag = models.CharField(max_length=30)
+    body = models.TextField()
+    cover = models.ImageField(upload_to='organizations')
+    
 
 class Product(models.Model):
     title = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField()
+    cover = models.ImageField(upload_to='products')
+    organization = models.ForeignKey(Organization, related_name='organizations', on_delete=models.CASCADE)
 
 
-class Organization(models.Model):
-    user = models.ForeignKey(User, related_name='users', on_delete=models.CASCADE)
-    title = models.CharField(max_length=50)
-    adress = models.CharField(max_length=255)
-    phone_number = models.CharField(max_length=14)
-    product = models.ForeignKey(Product, related_name='products', on_delete=models.CASCADE)
 
