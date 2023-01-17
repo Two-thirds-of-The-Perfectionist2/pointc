@@ -39,7 +39,7 @@ class User(AbstractUser):
     username = models.CharField(max_length=50, unique=True, null=True)
     is_active = models.BooleanField(default=False)
     activation_code = models.CharField(max_length=8, null=True)
-    cover = models.ImageField(upload_to='profile_picture')
+    picture = models.ImageField(upload_to='profile_picture')
     is_worker = models.BooleanField(default=False)
     is_organization = models.BooleanField(default=False)
 
