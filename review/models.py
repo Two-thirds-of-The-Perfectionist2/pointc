@@ -1,12 +1,14 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 
-from book.models import User
-from main.models import OrganizationCard
+from main.models import Organization
+
+User = get_user_model()
 
 
 class OrganizationComment(models.Model):
-    user_id = models.ForeignKey(User, related_name='comments', on_delete=models.CASCADE)
-    organization_id = models.ForeignKey(OrganizationCard, related_name='comments', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='comments', on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, related_name='comments', on_delete=models.CASCADE)
     body = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

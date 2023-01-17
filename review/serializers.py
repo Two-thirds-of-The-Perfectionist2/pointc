@@ -7,7 +7,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrganizationComment
-        exclude = ('user_id', )
+        exclude = ('user',)
     
 
     def validate(self, attrs):
@@ -17,3 +17,9 @@ class CommentSerializer(serializers.ModelSerializer):
 
         return attrs
     
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['user'] = instance.user.email
+
+        return rep
