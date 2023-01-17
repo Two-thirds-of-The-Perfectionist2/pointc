@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 
 from .tasks import send_activation_code
-# Create your models here
+
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
@@ -36,12 +36,10 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
-    username = models.CharField(max_length=50, unique=True, null=True)
+    name = models.CharField(max_length=50, unique=True, null=True)
+    picture = models.ImageField(upload_to='profile_picture')
     is_active = models.BooleanField(default=False)
     activation_code = models.CharField(max_length=8, null=True)
-    cover = models.ImageField(upload_to='profile_picture')
-    is_worker = models.BooleanField(default=False)
-    is_organization = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
