@@ -2,6 +2,7 @@ from rest_framework.serializers import ModelSerializer
 
 from .models import Organization, Product
 
+
 class OrganizationSerializer(ModelSerializer):
     class Meta:
         model = Organization
@@ -17,6 +18,7 @@ class OrganizationSerializer(ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         rep['user'] = instance.user.email
+        rep['rating'] = instance.average_rating
 
         return rep
 

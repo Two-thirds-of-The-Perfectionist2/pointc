@@ -19,12 +19,12 @@ class OrganizationComment(models.Model):
 
 
 class OrganizationRating(models.Model):
-    rating = models.IntegerField(choices=[(1, 1), (2, 2), (3, 3), (4, 4), (5, 5)])
+    value = models.IntegerField(choices=[(1, 1), (2, 2), (3, 3), (4, 4), (5, 5)])
     user = models.ForeignKey(User, related_name='organization_ratings', on_delete=models.CASCADE)
     organization = models.ForeignKey(Organization, related_name='organization_ratings', on_delete=models.CASCADE)
 
 
 class UserRating(models.Model):
-    rating = models.IntegerField(choices=[(1, 1), (2, 2), (3, 3), (4, 4), (5, 5)])
+    value = models.IntegerField(choices=[(1, 1), (2, 2), (3, 3), (4, 4), (5, 5)])
     customer = models.ForeignKey(User, related_name='customer_ratings', on_delete=models.CASCADE)
     deliveryman = models.ForeignKey(User, related_name='deliveryman_ratings', on_delete=models.CASCADE)

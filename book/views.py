@@ -5,9 +5,10 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from .serializers import RegisterUserSerializer, NewPasswordSerializer
+from .serializers import RegisterUserSerializer, NewPasswordSerializer, UserSerializer
 from .models import User
 from .tasks import send_code_for_reset
+from review.serializers import UserRating, UserRatingSerializer
 
 
 class RegisterUserView(APIView):
@@ -70,3 +71,34 @@ def new_password_post(request, activation_code):
         ser.save()
 
         return Response('Your password successfully update', status=200)
+
+
+@api_view(['GET'])
+def details_user(request, id):
+    user = get_object_or_404(User, id=id)
+    serializer = UserSerializer(user)
+
+    return Response(serializer.data, status=200)
+
+
+@api_view(['POST'])
+def rating(request, id=None):
+    print(id)
+    user = request.user
+    request.data._mutable = True
+    request.data.update({'deliveryman': id})
+    ser = UserRatingSerializer(data=request.data, context={'request':request})
+    ser.is_valid(raise_exception=True)
+
+    if request.user.is_authenticated:
+
+        if UserRating.objects.filter(customer=user, deliveryman__id=id).exists():
+            rating = UserRating.objects.get(customer=user, deliveryman__id=id)
+            rating.value = request.data.get('value')
+            rating.save()
+        else:
+            ser.save()
+
+        return Response(status=201)
+    
+    return Response(status=403)

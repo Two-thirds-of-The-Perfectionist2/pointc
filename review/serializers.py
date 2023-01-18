@@ -25,7 +25,7 @@ class CommentSerializer(serializers.ModelSerializer):
         return rep
 
 
-class CustomerRatingSerializer(serializers.ModelSerializer):
+class UserRatingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserRating
@@ -35,39 +35,10 @@ class CustomerRatingSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         attrs = super().validate(attrs)
         request = self.context.get('request')
-        attrs['user'] = request.user
+        attrs['customer'] = request.user
 
         return attrs
     
-
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        rep['user'] = instance.customer.email
-
-        return rep
-
-
-class DeliverymanRatingSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = UserRating
-        exclude = ('deliveryman',)
-    
-
-    def validate(self, attrs):
-        attrs = super().validate(attrs)
-        request = self.context.get('request')
-        attrs['user'] = request.user
-
-        return attrs
-    
-
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        rep['user'] = instance.deliveryman.email
-
-        return rep
-
 
 class OrganizationRatingSerializer(serializers.ModelSerializer):
 
@@ -80,12 +51,7 @@ class OrganizationRatingSerializer(serializers.ModelSerializer):
         attrs = super().validate(attrs)
         request = self.context.get('request')
         attrs['user'] = request.user
+        attrs['organization'] = request.data.get('organization')
 
         return attrs
     
-
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        rep['user'] = instance.user.email
-
-        return rep

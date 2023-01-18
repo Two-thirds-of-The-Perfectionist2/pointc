@@ -15,6 +15,17 @@ class Organization(models.Model):
     tag = models.CharField(max_length=30)
     body = models.TextField()
     cover = models.ImageField(upload_to='organizations')
+
+
+    @property
+    def average_rating(self):
+        ratings = self.organization_ratings.all() 
+        values = [i.value for i in ratings]
+
+        if values:
+            return sum(values) / len(values)
+
+        return 0
     
 
 class Product(models.Model):

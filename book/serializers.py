@@ -79,3 +79,17 @@ class NewPasswordSerializer(serializers.Serializer):
         user.save()
         
         return user
+
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('email', )
+
+    
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['rating'] = instance.average_rating
+
+        return rep

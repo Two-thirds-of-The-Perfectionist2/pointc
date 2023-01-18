@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -50,12 +51,13 @@ class OrginizationViewSet(ModelViewSet):
     @action(['POST'], detail=True)
     def rating(self, request, pk=None):
         user = request.user
+        request.data._mutable = True
+        request.data.update({'organization': get_object_or_404(Organization, id=pk)})
         ser = OrganizationRatingSerializer(data=request.data, context={'request':request})
         ser.is_valid(raise_exception=True)
-        organization_id = pk
 
-        if OrganizationRating.objects.filter(user=user, organization__id=organization_id).exists():
-            rating = OrganizationRating.objects.get(user=user, organization__id=organization_id)
+        if OrganizationRating.objects.filter(user=user, organization__id=pk).exists():
+            rating = OrganizationRating.objects.get(user=user, organization__id=pk)
             rating.value = request.data.get('value')
             rating.save()
         else:
@@ -91,7 +93,7 @@ class ProductViewSet(ModelViewSet):
             return self.get_paginated_response(serializer.data)
             
         serializer = self.get_serializer(queryset, many=True)
-        
+
         return Response(serializer.data, status=200)
 
 

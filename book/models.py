@@ -54,3 +54,14 @@ class User(AbstractUser):
         code = get_random_string(length=8, allowed_chars='qwertyuiopasdfghjklzxcvbnmQWERTYUIOASDFGHJKLZXCVBNM234567890')
         self.activation_code = code
         self.save()
+
+
+    @property
+    def average_rating(self):
+        ratings = self.organization_ratings.all() 
+        values = [i.value for i in ratings]
+
+        if values:
+            return sum(values) / len(values)
+
+        return 0
