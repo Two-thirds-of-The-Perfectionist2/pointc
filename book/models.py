@@ -37,7 +37,7 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=50, unique=False, null=True)
-    picture = models.ImageField(upload_to='profile_picture')
+    picture = models.ImageField(upload_to='profile_picture', null=True)
     is_active = models.BooleanField(default=False)
     activation_code = models.CharField(max_length=8, null=True)
 
