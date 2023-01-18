@@ -1,3 +1,4 @@
+from django.http.request import QueryDict
 from django.shortcuts import get_object_or_404
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import api_view
@@ -20,18 +21,22 @@ class CommentViewSet(ModelViewSet):
     
 
     def create(self, request, *args, **kwargs):
-        request.data._mutable = True
+        if type(request.data) == QueryDict:
+            request.data._mutable = True
+        
         request.data.update({'organization': self.kwargs['organization_pk']})
-
+        
         return super().create(request, *args, **kwargs)
-    
+     
 
     def update(self, request, *args, **kwargs):
         if request.data.get('organization'):
-            raise NotAcceptable(detail='Field "post" not available for update')
+            raise NotAcceptable(detail='Field "organization" not available for update')
 
-        request.data._mutable = True
-        request.data.update({'organization': self.get_object().organization.id})
+        if type(request.data) == QueryDict:
+            request.data._mutable = True
+        
+        request.data.update({'organization': self.kwargs['organization_pk']})
 
         return super().update(request, *args, **kwargs)
 
