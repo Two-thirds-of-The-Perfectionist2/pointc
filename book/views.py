@@ -73,7 +73,7 @@ def new_password_post(request, activation_code):
         return Response('Your password successfully update', status=200)
 
 
-@api_view(['GET'])
+@api_view(['GET'])  
 def details_user(request, id):
     user = get_object_or_404(User, id=id)
     serializer = UserSerializer(user)
@@ -81,6 +81,7 @@ def details_user(request, id):
     return Response(serializer.data, status=200)
 
 
+@swagger_auto_schema(request_body=UserRatingSerializer(), method='POST')
 @api_view(['POST'])
 def rating(request, id=None):
     print(id)
