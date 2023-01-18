@@ -13,6 +13,8 @@ urlpatterns = [
     path('login/', TokenObtainPairView.as_view()),
     path('login/refresh/', TokenRefreshView.as_view()),
     path('delete/<int:id>/', delete_user),
+    path('<int:id>/', details_user),
+    path('<int:id>/rating/', rating),
     path('forgot/', forgot_password),
     path('accept/<str:activation_code>/', new_password_post),
 ]

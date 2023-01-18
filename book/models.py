@@ -36,8 +36,8 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
-    username = models.CharField(max_length=50, unique=False, null=True)
-    picture = models.ImageField(upload_to='profile_picture')
+    username = models.CharField(max_length=24, unique=False, null=True)
+    picture = models.ImageField(upload_to='users', default='default/user.jpg')
     is_active = models.BooleanField(default=False)
     activation_code = models.CharField(max_length=8, null=True)
 
@@ -54,3 +54,14 @@ class User(AbstractUser):
         code = get_random_string(length=8, allowed_chars='qwertyuiopasdfghjklzxcvbnmQWERTYUIOASDFGHJKLZXCVBNM234567890')
         self.activation_code = code
         self.save()
+
+
+    @property
+    def average_rating(self):
+        ratings = self.deliveryman_ratings.all() 
+        values = [i.value for i in ratings]
+
+        if values:
+            return sum(values) / len(values)
+
+        return 0
