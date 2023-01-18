@@ -6,13 +6,14 @@ from drf_yasg import openapi
 
 from .models import Organization, Product
 from .serializers import OrganizationSerializer,ProductSerializer
-from .filters import ProductFilter
+from .filters import OrganizationFilter
 from .permissions import IsAuthorOrReadOnly
 from django.db.models import Q
 
 class OrginizationViewSet(ModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
+    filterset_class = OrganizationFilter
 
     def get_permissions(self):
         return [IsAuthorOrReadOnly()]
@@ -44,7 +45,6 @@ class OrginizationViewSet(ModelViewSet):
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    filterset_class = ProductFilter
 
     def get_permissions(self):
         
