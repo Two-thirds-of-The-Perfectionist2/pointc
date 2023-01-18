@@ -58,6 +58,7 @@ def forgot_password(request):
     return Response('send_mail' ,status=200)
 
 
+@swagger_auto_schema(request_body=NewPasswordSerializer(), method='POST')
 @api_view(['POST'])
 def new_password_post(request, activation_code):
     user = get_object_or_404(User, activation_code=activation_code)
