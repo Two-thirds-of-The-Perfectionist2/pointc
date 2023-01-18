@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import OrganizationComment, OrganizationRating, UserRating
+from .models import *
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -54,4 +54,35 @@ class OrganizationRatingSerializer(serializers.ModelSerializer):
         attrs['organization'] = request.data.get('organization')
 
         return attrs
+
+
+class OrganizationLikeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = OrganizationLike
+        exclude = ('user',)
     
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        request = self.context.get('request')
+        attrs['user'] = request.user
+        attrs['organization'] = request.data.get('organization')
+
+        return attrs
+
+
+class ProductFavoriteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ProductFavorite
+        exclude = ('user',)
+    
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        request = self.context.get('request')
+        attrs['user'] = request.user
+        attrs['product'] = request.data.get('product')
+
+        return attrs

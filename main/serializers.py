@@ -18,7 +18,8 @@ class OrganizationSerializer(ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         rep['user'] = instance.user.email
-        rep['rating'] = instance.average_rating
+        rep['ratings'] = instance.average_rating
+        rep['likes'] = instance.likes.count()
 
         return rep
 
