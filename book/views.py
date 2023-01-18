@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 from .serializers import RegisterUserSerializer, NewPasswordSerializer
 from .models import User
@@ -42,6 +43,9 @@ def activate_view(request, activation_code):
     return Response('Congratulations!', status=200)
 
 
+@swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('email', openapi.IN_QUERY, type=openapi.TYPE_STRING)
+    ], method='GET')
 @api_view(['GET'])
 def forgot_password(request):
     email = request.query_params.get('email')
