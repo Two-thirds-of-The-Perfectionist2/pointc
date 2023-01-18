@@ -17,6 +17,17 @@ class Organization(models.Model):
     user = models.ForeignKey(User, related_name='organizations', on_delete=models.CASCADE)
     
 
+    @property
+    def average_rating(self):
+        ratings = self.organization_ratings.all() 
+        values = [i.value for i in ratings]
+
+        if values:
+            return sum(values) / len(values)
+
+        return 0
+    
+
 class Product(models.Model):
     title = models.CharField(max_length=24)
     price = models.DecimalField(max_digits=10, decimal_places=2)

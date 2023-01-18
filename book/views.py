@@ -1,13 +1,16 @@
+from django.http.request import QueryDict
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.exceptions import NotAuthenticated
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from .serializers import RegisterUserSerializer, NewPasswordSerializer
+from .serializers import RegisterUserSerializer, NewPasswordSerializer, UserSerializer
 from .models import User
 from .tasks import send_code_for_reset
+from review.serializers import UserRating, UserRatingSerializer
 
 
 class RegisterUserView(APIView):
@@ -71,3 +74,36 @@ def new_password_post(request, activation_code):
         ser.save()
 
         return Response('Your password successfully update', status=200)
+
+
+@api_view(['GET'])  
+def details_user(request, id):
+    user = get_object_or_404(User, id=id)
+    serializer = UserSerializer(user)
+
+    return Response(serializer.data, status=200)
+
+
+@swagger_auto_schema(request_body=UserRatingSerializer(), method='POST')
+@api_view(['POST'])
+def rating(request, id=None):
+    if not request.user.is_authenticated:
+        raise NotAuthenticated()
+
+    if type(request.data) == QueryDict:
+        request.data._mutable = True
+
+    request.data.update({'deliveryman': id})
+    user = request.user
+    ser = UserRatingSerializer(data=request.data, context={'request':request})
+    ser.is_valid(raise_exception=True)
+
+    if UserRating.objects.filter(customer=user, deliveryman__id=id).exists():
+        rating = UserRating.objects.get(customer=user, deliveryman__id=id)
+        rating.value = request.data.get('value')
+        rating.save()
+    else:
+        ser.save()
+
+    return Response(status=201)
+    
