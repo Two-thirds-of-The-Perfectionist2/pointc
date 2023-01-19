@@ -35,6 +35,8 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 
 
 class NewPasswordSerializer(serializers.Serializer):
+    activation_code = serializers.CharField(max_length=8, required=True)
+    password = serializers.CharField(min_length=8, required=True)
     password_confirm = serializers.CharField(min_length=8, required=True)
 
 
