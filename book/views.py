@@ -64,7 +64,7 @@ def forgot_password(request):
 
 @swagger_auto_schema(request_body=NewPasswordSerializer(), method='POST')
 @api_view(['POST'])
-def new_password_post(request, activation_code):
+def new_password_post(request):
     ser = NewPasswordSerializer(data=request.data, context={'request': request})
     ser.is_valid(raise_exception=True)
 
