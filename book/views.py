@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.http.request import QueryDict
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
@@ -101,3 +102,19 @@ def rating(request, id=None):
 
     return Response(status=201)
     
+
+@api_view(['PATCH'])
+def add_balance(request):
+    user = request.user
+    if not user.is_authenticated:
+        return Response(status=401)
+    if not 'balance' in request.data:
+        return Response({"balance":["this field is required"]})
+    try:
+        balance = Decimal(request.data['balance']) 
+    except:
+        return Response({"balance":["invalid type for balance"]})
+    user.balance += balance
+    user.save()
+
+    return Response(status=201)
