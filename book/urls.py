@@ -15,6 +15,6 @@ urlpatterns = [
     path('delete/<int:id>/', delete_user),
     path('<int:id>/', details_user),
     path('<int:id>/rating/', rating),
-    path('forgot/', forgot_password),
-    path('accept/<str:activation_code>/', new_password_post),
+    path('send-forgot/', forgot_password),
+    path('reset-password/', new_password_post),
 ]
