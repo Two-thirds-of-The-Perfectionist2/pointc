@@ -20,6 +20,7 @@ class OrganizationSerializer(ModelSerializer):
         rep['user'] = instance.user.email
         rep['ratings'] = instance.average_rating
         rep['likes'] = instance.likes.count()
+        rep['products'] = ProductSerializer(instance.products.all(), many=True).data
 
         return rep
 
