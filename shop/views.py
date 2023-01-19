@@ -44,8 +44,7 @@ class DeliveryViewSet(viewsets.ViewSet):
 
 
     def list(self, request):
-        # queryset = Delivery.objects.filter(deliveryman=None)
-        queryset = Delivery.objects.all()
+        queryset = Delivery.objects.filter(deliveryman=None)
         ser = DeliverySerializer(queryset, many=True)
 
         return Response(ser.data)
