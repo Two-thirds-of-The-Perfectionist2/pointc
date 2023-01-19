@@ -28,9 +28,6 @@ class DeliveryViewSet(viewsets.ViewSet):
 
 
     def partial_update(self, request, pk=None):
-        # if not request.data.get('deliveryman'):
-        #     raise serializers.ValidationError()
-
         if type(request.data) == QueryDict:
             request.data._mutable = True
 
