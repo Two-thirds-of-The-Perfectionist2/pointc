@@ -64,16 +64,10 @@ def forgot_password(request):
 @swagger_auto_schema(request_body=NewPasswordSerializer(), method='POST')
 @api_view(['POST'])
 def new_password_post(request, activation_code):
-    user = get_object_or_404(User, activation_code=activation_code)
-    ser = NewPasswordSerializer(data=request.data)
-    user.activation_code = None
+    ser = NewPasswordSerializer(data=request.data, context={'request': request})
+    ser.is_valid(raise_exception=True)
 
-    if ser.is_valid(raise_exception=True):
-        user.is_active = True
-        user.save()
-        ser.save()
-
-        return Response('Your password successfully update', status=200)
+    return Response('Your password successfully update', status=200)
 
 
 @api_view(['GET'])  
