@@ -37,6 +37,7 @@ urlpatterns = [
     path('users/', include('book.urls')),
     path('', include('main.urls')),
     path('', include('review.urls')),
+    path('', include('shop.urls')),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
