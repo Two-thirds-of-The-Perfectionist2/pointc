@@ -12,10 +12,10 @@ from drf_yasg import openapi
 
 from .models import Organization, Product
 from .serializers import OrganizationSerializer,ProductSerializer
-from .filters import OrganizationFilter
+from .filters import OrganizationFilter    
 from .permissions import IsAuthorOrReadOnly, IsOrganizationOrReadOnly
 from review.models import OrganizationRating, OrganizationLike, ProductFavorite
-from review.serializers import OrganizationRatingSerializer, ProductFavoriteSerializer
+from review.serializers import OrganizationRatingSerializer
 
 
 User = get_user_model()
@@ -116,22 +116,46 @@ class ProductViewSet(ModelViewSet):
 @swagger_auto_schema(
     manual_parameters=[
         openapi.Parameter('q', openapi.IN_QUERY, type=openapi.TYPE_STRING),
+        openapi.Parameter('filter', openapi.IN_QUERY, type=openapi.TYPE_STRING),
     ], method='GET'
 )
 @api_view(['GET'])
 def search(request):
+    filter_ = request.query_params.get('filter')
     q = request.query_params.get('q')
 
-    if q:
+    if not q:
+        raise NotFound('Missing query parameters.')
+
+    if not filter_:
         organizations = Organization.objects.filter(title__icontains=q)
         products = Product.objects.filter(title__icontains=q)
         organizations = OrganizationSerializer(organizations, many=True)
         products = ProductSerializer(products, many=True)
         result = organizations.data + products.data
-    
-        if result:
-            paginated_result = PageNumberPagination().paginate_queryset(result, request)
 
-            return Response(paginated_result, status=200)
-    
-    raise NotFound('По вашему запросу ничего не найдено.')
+        paginator = PageNumberPagination()
+        paginated_result = paginator.paginate_queryset(result, request)
+
+        return paginator.get_paginated_response(paginated_result)
+
+    if filter_ == 'organizations':
+        organizations = Organization.objects.filter(title__icontains=q)
+        organizations = OrganizationSerializer(organizations, many=True)
+        result = organizations.data
+
+    elif filter_ == 'products':
+        products = Product.objects.filter(title__icontains=q)
+        products = ProductSerializer(products, many=True)
+        result = products.data
+
+    else:
+        raise NotFound('Invalid filter parameter.')
+
+    if not result:
+        raise NotFound('No results found for your query.')
+
+    paginator = PageNumberPagination()
+    paginated_result = paginator.paginate_queryset(result, request)
+
+    return paginator.get_paginated_response(paginated_result)
