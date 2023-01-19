@@ -121,11 +121,12 @@ class ProductViewSet(ModelViewSet):
 )
 @api_view(['GET'])
 def search(request):
-    filter_ = request.query_params.get('filter')
     q = request.query_params.get('q')
-
+    
     if not q:
         raise NotFound('Missing query parameters.')
+
+    filter_ = request.query_params.get('filter')
 
     if not filter_:
         organizations = Organization.objects.filter(title__icontains=q)
@@ -134,12 +135,7 @@ def search(request):
         products = ProductSerializer(products, many=True)
         result = organizations.data + products.data
 
-        paginator = PageNumberPagination()
-        paginated_result = paginator.paginate_queryset(result, request)
-
-        return paginator.get_paginated_response(paginated_result)
-
-    if filter_ == 'organizations':
+    elif filter_ == 'organizations':
         organizations = Organization.objects.filter(title__icontains=q)
         organizations = OrganizationSerializer(organizations, many=True)
         result = organizations.data
@@ -155,7 +151,6 @@ def search(request):
     if not result:
         raise NotFound('No results found for your query.')
 
-    paginator = PageNumberPagination()
-    paginated_result = paginator.paginate_queryset(result, request)
+    paginated_result = PageNumberPagination().paginate_queryset(result, request)
 
-    return paginator.get_paginated_response(paginated_result)
+    return Response(paginated_result, status=200)
