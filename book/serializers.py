@@ -44,13 +44,6 @@ class NewPasswordSerializer(serializers.Serializer):
         fields = ('activation_code', 'password', 'password_confirm')
 
 
-    def validate_code(self, activation_code):
-        if not User.objects.filter(activation_code=activation_code).exists():
-            raise serializers.ValidationError('Пользователя с таким codes не найден')
-        
-        return activation_code 
-
-
     def validate(self, attrs):
         pass1 = attrs.get('password')
         pass2 = attrs.pop('password_confirm')
