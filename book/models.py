@@ -40,6 +40,7 @@ class User(AbstractUser):
     picture = models.ImageField(upload_to='users', default='default/user.jpg')
     is_active = models.BooleanField(default=False)
     activation_code = models.CharField(max_length=8, null=True)
+    balance = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
