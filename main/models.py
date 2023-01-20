@@ -34,3 +34,6 @@ class Product(models.Model):
     description = models.TextField(blank=True)
     cover = models.ImageField(upload_to='products', default='default/product.jpg')
     organization = models.ForeignKey(Organization, related_name='products', on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return f'{self.title} {self.price}'

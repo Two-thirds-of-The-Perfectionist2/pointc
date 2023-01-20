@@ -28,6 +28,7 @@ class DeliveryViewSet(viewsets.ViewSet):
 
 
     def partial_update(self, request, pk=None):
+        DELIVERY_AMOUNT = 100
         if type(request.data) == QueryDict:
             request.data._mutable = True
 
@@ -35,9 +36,23 @@ class DeliveryViewSet(viewsets.ViewSet):
         request.data.update({'deliveryman': request.user.id})
         ser = DeliveryManSerializer(instance=delivery, data=request.data, partial=True, context={'request': request})
         ser.is_valid(raise_exception=True)
-        ser.save()
 
-        return Response(status=201)
+        amount = delivery.amount
+        customer = delivery.customer
+        if customer.balance >= amount:
+            customer.balance -= amount
+            customer.save()
+            request.user.balance += DELIVERY_AMOUNT
+            request.user.save()
+            if not delivery.carts.exists():
+                return Response('There is nothing in the cart', status=400)
+            org_user = delivery.carts.first().product.organization.user
+            org_user.balance += (amount - DELIVERY_AMOUNT)
+            org_user.save()
+            ser.save()
+            return Response(status=201)
+        else:
+            return Response('Not enough money on the balance', status=400)
 
 
     def list(self, request):
