@@ -5,6 +5,7 @@ psycopg2-binary
 python-decouple
 djangorestframework
 djangorestframework-simplejwt
+drf-api-logger
 drf-yasg
 drf-nested-routers
 pillow

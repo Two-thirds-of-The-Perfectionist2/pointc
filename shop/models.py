@@ -14,6 +14,15 @@ class Delivery(models.Model):
     customer = models.ForeignKey(User, related_name='customers', on_delete=models.CASCADE)
     deliveryman = models.ForeignKey(User, related_name='deliveries', on_delete=models.CASCADE, null=True)
 
+    @property
+    def amount(self):
+        carts =  self.carts.all()
+        prices = sum([i.product.price for i in carts])
+        DELIVERY_AMOUNT = 100
+        total = prices + DELIVERY_AMOUNT
+
+        return total
+
 
 class Cart(models.Model):
     delivery = models.ForeignKey(Delivery, related_name='carts', on_delete=models.CASCADE)

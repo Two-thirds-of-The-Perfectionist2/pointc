@@ -22,6 +22,7 @@ class DeliverySerializer(serializers.ModelSerializer):
         # print(instance.carts.delivery)
         rep = super().to_representation(instance)
         rep['cart'] = CartSerializer(instance.carts.all(), many=True).data
+        rep['total'] = instance.amount
 
         return rep
 

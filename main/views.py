@@ -9,6 +9,8 @@ from rest_framework.exceptions import NotAcceptable, NotFound
 from rest_framework.pagination import PageNumberPagination
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 
 from .models import Organization, Product
 from .serializers import OrganizationSerializer,ProductSerializer
@@ -68,7 +70,10 @@ class OrginizationViewSet(ModelViewSet):
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-
+    
+    @method_decorator(cache_page(60 * 15))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def get_queryset(self):
         return Product.objects.filter(organization=self.kwargs['organization_pk'])

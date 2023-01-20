@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'drf_api_logger',
     'django_filters',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -61,6 +62,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'drf_api_logger.middleware.api_logger_middleware.APILoggerMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -184,6 +187,18 @@ SWAGGER_SETTINGS = {
         }
     }
 }
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': BASE_DIR/ 'django_cache',
+    }
+}
+
+
+DRF_API_LOGGER_DATABASE = True
+
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
