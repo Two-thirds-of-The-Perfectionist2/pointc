@@ -1,7 +1,7 @@
 from decimal import Decimal
 from django.http.request import QueryDict
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import NotAuthenticated
@@ -12,6 +12,8 @@ from .serializers import RegisterUserSerializer, NewPasswordSerializer, UserSeri
 from .models import User
 from .tasks import send_code_for_reset
 from review.serializers import UserRating, UserRatingSerializer
+from shop.models import Delivery
+from shop.serializers import DeliverySerializer
 
 
 class RegisterUserView(APIView):
@@ -118,3 +120,14 @@ def add_balance(request):
     user.save()
 
     return Response(status=201)
+
+
+@api_view(['GET'])
+def history(request):
+    if not request.user.is_authenticated:
+        raise NotAuthenticated
+
+    queryset = Delivery.objects.filter(customer=request.user.id)
+    ser = DeliverySerializer(queryset, many=True)
+
+    return Response(ser.data)

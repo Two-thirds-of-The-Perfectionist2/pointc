@@ -1,6 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 
 from .models import Organization, Product
+from review.models import Subscription
 
 
 class OrganizationSerializer(ModelSerializer):
@@ -21,6 +22,7 @@ class OrganizationSerializer(ModelSerializer):
         rep['ratings'] = instance.average_rating
         rep['likes'] = instance.likes.count()
         rep['products'] = ProductSerializer(instance.products.all(), many=True).data
+        rep['subscribers'] = instance.subscriptions.count()
 
         return rep
 
@@ -30,3 +32,17 @@ class ProductSerializer(ModelSerializer):
         model = Product
         fields = '__all__'
     
+
+class SubscriptionSerializer(ModelSerializer):
+
+    class Meta:
+        model = Subscription
+        fields = '__all__'
+    
+
+    def validate(self, attrs):
+        attrs =  super().validate(attrs)
+        request = self.context.get('request')
+        attrs['user'] = request.user
+        
+        return attrs

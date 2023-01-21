@@ -14,6 +14,7 @@ urlpatterns = [
     path('login/refresh/', TokenRefreshView.as_view()),
     path('delete/<int:id>/', delete_user),
     path('<int:id>/', details_user),
+    path('history/', history),
     path('<int:id>/rating/', rating),
     path('send-forgot/', forgot_password),
     path('reset-password/', new_password_post),
