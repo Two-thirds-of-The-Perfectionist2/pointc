@@ -5,8 +5,9 @@ from django.http.request import QueryDict
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
-from rest_framework.exceptions import NotAcceptable, NotFound
+from rest_framework.exceptions import NotAcceptable, NotFound, NotAuthenticated
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -16,6 +17,8 @@ from .filters import OrganizationFilter
 from .permissions import IsAuthorOrReadOnly, IsOrganizationOrReadOnly
 from review.models import OrganizationRating, OrganizationLike, ProductFavorite
 from review.serializers import OrganizationRatingSerializer
+from shop.models import Delivery
+from shop.serializers import DeliverySerializer, CartSerializer
 
 
 User = get_user_model()
@@ -154,3 +157,22 @@ def search(request):
     paginated_result = PageNumberPagination().paginate_queryset(result, request)
 
     return Response(paginated_result, status=200)
+
+
+@api_view(['GET'])
+def listing(request):
+    if not request.user.is_authenticated:
+        raise NotAuthenticated
+    
+    deliveries = Delivery.objects.filter(customer=request.user.id)
+    carts = [j.all() for j in [i.carts for i in deliveries]]
+    products = [i.first().product for i in carts]
+    organizations = [i.organization for i in products]
+    tags = [i.tag for i in organizations]
+    categories = [i.category for i in organizations]
+    rec = tags + categories
+    
+    organization = [i for i in Organization.objects.all() if i.category in rec or i.tag in rec]
+    ser = OrganizationSerializer(organization, many=True)
+
+    return Response(ser.data, status=200)
