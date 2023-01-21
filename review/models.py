@@ -39,3 +39,8 @@ class OrganizationLike(models.Model):
 class ProductFavorite(models.Model):
     user = models.ForeignKey(User, related_name='favorites', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, related_name='favorites', on_delete=models.CASCADE)
+
+
+class Subscription(models.Model):
+    user = models.ForeignKey(User, related_name='subscribers', on_delete=models.CASCADE)
+    subscribe = models.ForeignKey(Organization, related_name='subscriptions', on_delete=models.CASCADE)

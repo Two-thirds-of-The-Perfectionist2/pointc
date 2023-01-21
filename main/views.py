@@ -12,10 +12,10 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
 from .models import Organization, Product
-from .serializers import OrganizationSerializer,ProductSerializer
+from .serializers import OrganizationSerializer,ProductSerializer, SubscriptionSerializer
 from .filters import OrganizationFilter    
 from .permissions import IsAuthorOrReadOnly, IsOrganizationOrReadOnly
-from review.models import OrganizationRating, OrganizationLike, ProductFavorite
+from review.models import OrganizationRating, OrganizationLike, ProductFavorite, Subscription
 from review.serializers import OrganizationRatingSerializer
 from shop.models import Delivery
 from shop.serializers import DeliverySerializer, CartSerializer
@@ -66,6 +66,25 @@ class OrginizationViewSet(ModelViewSet):
             OrganizationLike.objects.create(organization=organization, user=user)
 
         return Response(status=201)
+    
+
+    @action(['POST'], detail=True)
+    def subs(self, request, pk=None):
+        if not request.user.is_authenticated:
+            raise NotAuthenticated
+
+        user_id = request.user.id
+        user = get_object_or_404(User, id=user_id)
+        subscribe = get_object_or_404(Organization, id=pk)
+        
+
+        if Subscription.objects.filter(subscribe=subscribe, user=user).exists():
+            Subscription.objects.filter(subscribe=subscribe, user=user).delete()
+        else:
+            Subscription.objects.create(subscribe=subscribe, user=user)
+
+        return Response(status=201)
+
 
 
 class ProductViewSet(ModelViewSet):

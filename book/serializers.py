@@ -2,6 +2,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 from .models import User
+from review.models import Subscription
+from main.models import Organization
+from main.serializers import OrganizationSerializer
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):
@@ -64,6 +67,13 @@ class NewPasswordSerializer(serializers.Serializer):
         return attrs
 
 
+class SubscriberSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Subscription
+        fields = ('subscribe',)
+
+
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -74,5 +84,11 @@ class UserSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         rep['rating'] = instance.average_rating
+        subs = SubscriberSerializer(instance.subscribers.all(), many=True).data
+        list_ = [i.get('subscribe') for i in subs]
+        # print(list_)
+        # organization = [i for i in Organization.objects.all() if i.id in list_]
+        
+        rep['subscribes'] = [i.title for i in Organization.objects.all() if i.id in list_]
 
         return rep
