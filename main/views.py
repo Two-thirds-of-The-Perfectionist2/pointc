@@ -200,3 +200,21 @@ def listing(request):
     ser = OrganizationSerializer(organization, many=True)
 
     return Response(ser.data, status=200)
+
+
+@api_view(['GET'])
+def support_bot(request):
+    if not request.user.is_authenticated:
+        raise NotAuthenticated
+    
+    q = request.query_params.get('q')
+    
+    if not q:
+        raise NotFound('Missing query parameters.')
+    
+    response = {'1': OrganizationSerializer(Organization.objects.all(), many=True).data,
+                '2': ProductSerializer(Product.objects.all(), many=True).data,
+                '3': 'question 3',
+                '4': 'question 4'}
+    
+    return Response(response[q])
