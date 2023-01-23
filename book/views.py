@@ -10,7 +10,7 @@ from drf_yasg import openapi
 
 from .serializers import RegisterUserSerializer, NewPasswordSerializer, UserSerializer
 from .models import User
-from .tasks import send_code_for_reset
+from .tasks import send_code_for_reset, send_activation_code
 from review.serializers import UserRating, UserRatingSerializer
 from shop.models import Delivery
 from shop.serializers import DeliverySerializer
@@ -25,6 +25,17 @@ class RegisterUserView(APIView):
         ser.save()
 
         return Response('Successfully registration')
+
+
+@api_view(['POST'])
+def resend_activation_code(request):
+    email = request.query_params.get('email')
+    user = get_object_or_404(User, email=email)
+    user.create_activation_code()
+    user.save()
+    send_activation_code.delay(user.email, user.activation_code)
+
+    return Response('Mail with secret code resend your email', 201)
 
 
 @api_view(['DELETE'])
