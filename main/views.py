@@ -184,7 +184,7 @@ def search(request):
 
 
 @api_view(['GET'])
-def listing(request):
+def recommendation(request):
     if not request.user.is_authenticated:
         raise NotAuthenticated
     
@@ -200,3 +200,23 @@ def listing(request):
     ser = OrganizationSerializer(organization, many=True)
 
     return Response(ser.data, status=200)
+
+
+@swagger_auto_schema(
+    manual_parameters=[
+        openapi.Parameter('q', openapi.IN_QUERY, type=openapi.TYPE_STRING),
+    ], method='GET'
+)
+@api_view(['GET'])
+def support_bot(request):
+    q = request.query_params.get('q')
+    
+    if not q:
+        raise NotFound('Missing query parameters.')
+    
+    response = {'1': OrganizationSerializer(Organization.objects.all(), many=True).data,
+                '2': ProductSerializer(Product.objects.all(), many=True).data,
+                '3': 'question 3',
+                '4': 'question 4'}
+    
+    return Response(response.get(q), status=200)

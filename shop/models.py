@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from main.models import Product
 
 
+
 User = get_user_model()
 
 
@@ -14,6 +15,16 @@ class Delivery(models.Model):
     body = models.TextField(null=True)
     customer = models.ForeignKey(User, related_name='customers', on_delete=models.CASCADE)
     deliveryman = models.ForeignKey(User, related_name='deliveries', on_delete=models.CASCADE, null=True)
+    activation_code = models.CharField(max_length=8, null=True)
+
+
+    def create_activation_code(self):
+        from django.utils.crypto import get_random_string
+
+        code = get_random_string(length=8, allowed_chars='qwertyuiopasdfghjklzxcvbnmQWERTYUIOASDFGHJKLZXCVBNM234567890')
+        self.activation_code = code
+        self.save()
+
 
     @property
     def price(self):

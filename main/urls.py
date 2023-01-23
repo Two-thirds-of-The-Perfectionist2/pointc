@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_nested.routers import NestedSimpleRouter
 
-from .views import OrginizationViewSet, ProductViewSet, search, listing
+from .views import OrginizationViewSet, ProductViewSet, search, recommendation, support_bot
 
 
 router = DefaultRouter()
@@ -14,5 +14,6 @@ urlpatterns =[
     path('', include(router.urls)),
     path('', include(product_router.urls)),
     path('search/', search),
-    path('recommendations/', listing),
+    path('recommendations/', recommendation),
+    path('support-bot/', support_bot),
 ]

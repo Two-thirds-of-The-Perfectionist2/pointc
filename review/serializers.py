@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import *
+from main.serializers import ProductSerializer
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -86,3 +87,13 @@ class ProductFavoriteSerializer(serializers.ModelSerializer):
         attrs['product'] = request.data.get('product')
 
         return attrs
+
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['organization'] = instance.product.organization.title
+        rep['title'] = instance.product.title
+        rep['price'] = instance.product.price
+        rep['cover'] = ProductSerializer(instance.product).data.get('cover')
+
+        return rep
