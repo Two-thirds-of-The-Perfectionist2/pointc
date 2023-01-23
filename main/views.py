@@ -209,9 +209,6 @@ def recommendation(request):
 )
 @api_view(['GET'])
 def support_bot(request):
-    if not request.user.is_authenticated:
-        raise NotAuthenticated
-    
     q = request.query_params.get('q')
     
     if not q:
@@ -222,4 +219,4 @@ def support_bot(request):
                 '3': 'question 3',
                 '4': 'question 4'}
     
-    return Response(response[q])
+    return Response(response.get(q), status=200)
