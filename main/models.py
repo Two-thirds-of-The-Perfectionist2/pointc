@@ -1,4 +1,4 @@
-from django.db import models
+from django.contrib.gis.db import models
 
 from django.contrib.auth import get_user_model
 
@@ -9,7 +9,8 @@ User = get_user_model()
 class Organization(models.Model):
     title = models.CharField(max_length=24)
     address = models.CharField(max_length=32)
-    phone_number = models.CharField(max_length=24)
+    location = models.PointField(null=True)
+    phone = models.CharField(max_length=24)
     category = models.CharField(max_length=24, choices=[('Еда', 'Food'), ('Товары', 'Merchandise'), ('Другое', 'Other')])
     tag = models.CharField(max_length=24, blank=True)
     body = models.TextField(blank=True)

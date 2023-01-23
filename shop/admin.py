@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.gis.admin import OSMGeoAdmin
 
 from .models import Cart, Delivery
 
@@ -6,8 +7,10 @@ from .models import Cart, Delivery
 class CartInline(admin.TabularInline):
     model = Cart
 
-class DeliveryAdmin(admin.ModelAdmin):
-    inlines = [CartInline]
 
-# admin.site.register(Cart)     
-admin.site.register(Delivery,DeliveryAdmin)
+@admin.register(Delivery)
+class DeliveryAdmin(OSMGeoAdmin):
+    list_display = ('address', 'phone', 'location')
+
+
+admin.site.register(Cart)     
