@@ -27,6 +27,12 @@ class DeliverySerializer(serializers.ModelSerializer):
         return rep
 
 
+    def create(self, validated_data):
+        delivery = Delivery.objects.create(**validated_data)
+        delivery.create_activation_code()
+        return delivery
+
+
 class DeliveryManSerializer(serializers.ModelSerializer):
 
     class Meta:
