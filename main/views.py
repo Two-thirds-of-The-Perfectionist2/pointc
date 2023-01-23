@@ -184,7 +184,7 @@ def search(request):
 
 
 @api_view(['GET'])
-def listing(request):
+def recommendation(request):
     if not request.user.is_authenticated:
         raise NotAuthenticated
     

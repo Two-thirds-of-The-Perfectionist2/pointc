@@ -5,6 +5,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework import serializers
+from drf_yasg.utils import swagger_auto_schema
 
 from .models import Delivery, Cart
 from .serializers import DeliverySerializer, CartSerializer, DeliveryManSerializer
@@ -19,6 +20,7 @@ class DeliveryViewSet(viewsets.ViewSet):
         return [IsAuthenticatedOrReadOnly()]
 
 
+    @swagger_auto_schema(request_body=DeliverySerializer())
     def create(self, request):
         ser = DeliverySerializer(data=request.data, context={'request': request})
         ser.is_valid(raise_exception=True)
@@ -68,6 +70,7 @@ class CartViewSet(viewsets.ViewSet):
         return Cart.objects.filter(delivery=self.kwargs['delivery_pk'])
 
 
+    @swagger_auto_schema(request_body=CartSerializer())
     def create(self, request, delivery_pk, *args, **kwargs):
         if type(request.data) == QueryDict:
             request.data._mutable = True

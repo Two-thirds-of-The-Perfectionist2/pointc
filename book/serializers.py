@@ -86,9 +86,6 @@ class UserSerializer(serializers.ModelSerializer):
         rep['rating'] = instance.average_rating
         subs = SubscriberSerializer(instance.subscribers.all(), many=True).data
         list_ = [i.get('subscribe') for i in subs]
-        # print(list_)
-        # organization = [i for i in Organization.objects.all() if i.id in list_]
-        
         rep['subscribes'] = [i.title for i in Organization.objects.all() if i.id in list_]
 
         return rep
