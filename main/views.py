@@ -202,6 +202,11 @@ def recommendation(request):
     return Response(ser.data, status=200)
 
 
+@swagger_auto_schema(
+    manual_parameters=[
+        openapi.Parameter('q', openapi.IN_QUERY, type=openapi.TYPE_STRING),
+    ], method='GET'
+)
 @api_view(['GET'])
 def support_bot(request):
     if not request.user.is_authenticated:
