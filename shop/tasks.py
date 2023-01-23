@@ -5,7 +5,7 @@ from decouple import config
 
 @shared_task
 def send_confirmation_code(email, activation_code):
-    activation_link = f'http://{config("CURRENT_HOST")}/delivery/{activation_code}/'
+    activation_link = f'http://{config("CURRENT_HOST")}/deliveries/{activation_code}/'
     message = f"""
                Hello! Thank you for using our service. \n  
 

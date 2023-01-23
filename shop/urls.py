@@ -15,5 +15,5 @@ cart_router.register('carts', CartViewSet, basename='cart')
 urlpatterns = [
     path('', include(router.urls)),
     path('', include(cart_router.urls)),
-    path('delivery/<str:activation_code>/', activate_view)
+    path('deliveries/<str:activation_code>/', activate_view)
 ]

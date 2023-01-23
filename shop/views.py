@@ -87,4 +87,4 @@ def activate_view(request, activation_code):
     delivery.activation_code = None
     delivery.save()
 
-    return Response('Exellant, The order is confirmed!', status=200)
+    return Response('Exellent, The order is confirmed!', status=200)
