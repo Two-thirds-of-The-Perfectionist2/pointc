@@ -19,5 +19,5 @@ urlpatterns = [
     path('<int:id>/rating/', rating),
     path('send-forgot/', forgot_password),
     path('reset-password/', new_password_post),
-    path('balance_topup/', add_balance),
+    path('balance/', add_balance),
 ]

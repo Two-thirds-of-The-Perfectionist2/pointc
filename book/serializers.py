@@ -89,3 +89,10 @@ class UserSerializer(serializers.ModelSerializer):
         rep['subscribes'] = [i.title for i in Organization.objects.all() if i.id in list_]
 
         return rep
+
+
+class UserBalanceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('balance',)

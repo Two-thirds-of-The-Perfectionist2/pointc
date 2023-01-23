@@ -8,7 +8,7 @@ from rest_framework.exceptions import NotAuthenticated
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from .serializers import RegisterUserSerializer, NewPasswordSerializer, UserSerializer
+from .serializers import RegisterUserSerializer, NewPasswordSerializer, UserSerializer, UserBalanceSerializer
 from .models import User
 from .tasks import send_code_for_reset, send_activation_code
 from review.serializers import UserRating, UserRatingSerializer
@@ -116,18 +116,14 @@ def rating(request, id=None):
     return Response(status=201)
     
 
+@swagger_auto_schema(request_body=UserBalanceSerializer, method='PATCH')
 @api_view(['PATCH'])
 def add_balance(request):
+    ser = UserBalanceSerializer(data=request.data, context={'request': request})
+    ser.is_valid(raise_exception=True)
+
     user = request.user
-    if not user.is_authenticated:
-        return Response(status=401)
-    if not 'balance' in request.data:
-        return Response({"balance":["this field is required"]})
-    try:
-        balance = Decimal(request.data['balance']) 
-    except:
-        return Response({"balance":["invalid type for balance"]})
-    user.balance += balance
+    user.balance += Decimal(request.data.get('balance'))
     user.save()
 
     return Response(status=201)
