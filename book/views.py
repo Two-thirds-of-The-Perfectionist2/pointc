@@ -27,6 +27,11 @@ class RegisterUserView(APIView):
         return Response('Successfully registration')
 
 
+@swagger_auto_schema(
+    manual_parameters=[
+        openapi.Parameter('email', openapi.IN_QUERY, type=openapi.TYPE_STRING),
+    ], method='GET'
+)
 @api_view(['GET'])
 def resend_activation_code(request):
     email = request.query_params.get('email')
