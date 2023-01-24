@@ -30,4 +30,7 @@ class IsOrganizationOrReadOnly(BasePermission):
             return True
         if not request.user.is_authenticated:
             return False
-        return request.user == obj.organization.user
+            
+        return request.user == obj.user
+            
+
