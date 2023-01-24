@@ -105,10 +105,3 @@ def order_done(request, id):
     delivery.save()
     return Response(status=201)
 
-
-def activate_view(request, id):
-    user = get_object_or_404(Delivery, id=id)
-    user.is_done = True
-    user.save()
-
-    return Response('Congratulations!', status=200)
