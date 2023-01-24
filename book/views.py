@@ -13,7 +13,7 @@ from .models import User
 from .tasks import send_code_for_reset, send_activation_code
 from review.serializers import UserRating, UserRatingSerializer
 from shop.models import Delivery
-from shop.serializers import DeliverySerializer
+from shop.serializers import HistorySerializer
 
 
 class RegisterUserView(APIView):
@@ -146,6 +146,6 @@ def history(request):
         raise NotAuthenticated
 
     queryset = Delivery.objects.filter(customer=request.user.id)
-    ser = DeliverySerializer(queryset, many=True)
+    ser = HistorySerializer(queryset, many=True)
 
     return Response(ser.data)
