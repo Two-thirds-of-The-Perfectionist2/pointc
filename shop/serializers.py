@@ -21,10 +21,14 @@ class DeliverySerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         request = self.context.get('request')
 
-        if instance.deliveryman == request.user or not instance.deliveryman:
+        if not instance.deliveryman or instance.deliveryman == request.user:
             rep = super().to_representation(instance)
+            rep['title organization'] = instance.carts.first().product.organization.title
+            rep['title product'] = instance.carts.first().product.title
+            rep['organization address'] = instance.carts.first().product.organization.address
+            rep['organization phone'] = instance.carts.first().product.organization.phone
             rep['cart'] = CartSerializer(instance.carts.all(), many=True).data
-            rep['price'] = instance.price
+            rep['price'] = instance.price.get('delivery')
 
             return rep
         
