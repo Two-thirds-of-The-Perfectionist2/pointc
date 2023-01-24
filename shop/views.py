@@ -54,8 +54,8 @@ class DeliveryViewSet(viewsets.ViewSet):
 
 
     def list(self, request):
-        queryset = Delivery.objects.filter(deliveryman=None)
-        ser = DeliverySerializer(queryset, many=True)
+        queryset = Delivery.objects.filter(activation_code=None)
+        ser = DeliverySerializer(queryset, many=True, context={'request': request})
 
         return Response(ser.data)
 

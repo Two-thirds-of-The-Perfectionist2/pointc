@@ -216,7 +216,7 @@ def support_bot(request):
     
     response = {'1': OrganizationSerializer(Organization.objects.all(), many=True).data,
                 '2': ProductSerializer(Product.objects.all(), many=True).data,
-                '3': 'question 3',
+                'как вернуть деньги?': 'Эй, кыргызча суйло',
                 '4': 'question 4'}
     
     return Response(response.get(q), status=200)

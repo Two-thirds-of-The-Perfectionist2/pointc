@@ -19,7 +19,9 @@ class DeliverySerializer(serializers.ModelSerializer):
     
 
     def to_representation(self, instance):
-        if not instance.activation_code or not instance.deliveryman:
+        request = self.context.get('request')
+
+        if instance.deliveryman == request.user or not instance.deliveryman:
             rep = super().to_representation(instance)
             rep['cart'] = CartSerializer(instance.carts.all(), many=True).data
             rep['price'] = instance.price
@@ -32,6 +34,7 @@ class DeliverySerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         delivery = Delivery.objects.create(**validated_data)
         delivery.create_activation_code()
+
         return delivery
 
 
@@ -64,3 +67,36 @@ class CartSerializer(serializers.ModelSerializer):
         attrs['delivery'] = request.data.get('delivery')
 
         return attrs
+
+
+class HistorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Delivery
+        exclude = ('customer',)
+    
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        request = self.context.get('request')
+        attrs['customer'] = request.user
+
+        return attrs
+    
+
+    def to_representation(self, instance):
+        if instance.activation_code:
+            return f'Заказ {instance.id} еще не подтвержден.'
+
+        rep = super().to_representation(instance)
+        rep['cart'] = CartSerializer(instance.carts.all(), many=True).data
+        rep['price'] = instance.price
+
+        return rep
+        
+
+    def create(self, validated_data):
+        delivery = Delivery.objects.create(**validated_data)
+        delivery.create_activation_code()
+
+        return delivery
