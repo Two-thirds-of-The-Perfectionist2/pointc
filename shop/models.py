@@ -35,8 +35,6 @@ class Delivery(models.Model):
         products = sum([i.product.price for i in carts])
         
         query = Delivery.objects.annotate(distance=Distance('location', self.carts.first().product.organization.location)).filter(id=self.id).first()
-
-        print(query.distance)
         
         if query.distance < D(m=3000):
             delivery = products * Decimal(0.05)

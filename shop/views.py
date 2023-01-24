@@ -54,7 +54,7 @@ class DeliveryViewSet(viewsets.ViewSet):
 
 
     def list(self, request):
-        queryset = Delivery.objects.filter(activation_code=None)
+        queryset = Delivery.objects.filter(activation_code=None).order_by('deliveryman')
         ser = DeliverySerializer(queryset, many=True, context={'request': request})
 
         return Response(ser.data)
@@ -82,9 +82,7 @@ class CartViewSet(viewsets.ViewSet):
 @api_view(['GET'])
 def activate_view(request, activation_code):
     delivery = get_object_or_404(Delivery, activation_code=activation_code)
-
     amount = round(sum(delivery.price.values()), 2)
-    print('Цена', amount) 
     customer = delivery.customer
 
     if customer.balance >= amount:
