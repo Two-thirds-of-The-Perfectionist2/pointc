@@ -5,7 +5,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.decorators import api_view
-from rest_framework.exceptions import NotAcceptable
+from rest_framework.exceptions import NotAcceptable, ParseError
 from drf_yasg.utils import swagger_auto_schema
 
 from .tasks import send_confirmation_code
@@ -54,8 +54,8 @@ class DeliveryViewSet(viewsets.ViewSet):
 
 
     def list(self, request):
-        queryset = Delivery.objects.filter(deliveryman=None)
-        ser = DeliverySerializer(queryset, many=True)
+        queryset = Delivery.objects.filter(activation_code=None).order_by('deliveryman')
+        ser = DeliverySerializer(queryset, many=True, context={'request': request})
 
         return Response(ser.data)
 
@@ -82,9 +82,11 @@ class CartViewSet(viewsets.ViewSet):
 @api_view(['GET'])
 def activate_view(request, activation_code):
     delivery = get_object_or_404(Delivery, activation_code=activation_code)
+    
+    if not delivery.carts.first():
+        raise ParseError('Не удалось подтвердить заказ: корзина пуста.')
 
     amount = round(sum(delivery.price.values()), 2)
-    print('Цена', amount) 
     customer = delivery.customer
 
     if customer.balance >= amount:

@@ -19,7 +19,9 @@ class DeliverySerializer(serializers.ModelSerializer):
     
 
     def to_representation(self, instance):
-        if not instance.activation_code or not instance.deliveryman:
+        request = self.context.get('request')
+
+        if not instance.deliveryman or request.user == instance.deliveryman:
             rep = super().to_representation(instance)
             rep['cart'] = CartSerializer(instance.carts.all(), many=True).data
             rep['price'] = instance.price
