@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
@@ -96,3 +97,12 @@ class UserBalanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('balance',)
+    
+
+    def validate(self, attrs):
+        attrs =  super().validate(attrs)
+
+        if Decimal(attrs.get('balance')) <= 0:
+            raise serializers.ValidationError({'balance': ['Было передано пустое или отрицательное значение.']})
+        
+        return attrs

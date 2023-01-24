@@ -5,6 +5,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.decorators import api_view
+from rest_framework.exceptions import NotAcceptable
 from drf_yasg.utils import swagger_auto_schema
 
 from .tasks import send_confirmation_code
@@ -31,31 +32,25 @@ class DeliveryViewSet(viewsets.ViewSet):
 
 
     def partial_update(self, request, pk=None):
-        DELIVERY_AMOUNT = 100
+        delivery = get_object_or_404(Delivery, id=pk)
+        
+        if delivery.activation_code or delivery.deliveryman:
+            raise NotAcceptable()
+
         if type(request.data) == QueryDict:
             request.data._mutable = True
 
-        delivery = get_object_or_404(Delivery, id=pk)
         request.data.update({'deliveryman': request.user.id})
         ser = DeliveryManSerializer(instance=delivery, data=request.data, partial=True, context={'request': request})
         ser.is_valid(raise_exception=True)
+        org_user = delivery.carts.first().product.organization.user
+        org_user.balance += delivery.price.get('products')
+        org_user.save()
+        request.user.balance += delivery.price.get('delivery')
+        request.user.save()
+        ser.save()
 
-        amount = delivery.amount
-        customer = delivery.customer
-        if customer.balance >= amount:
-            customer.balance -= amount
-            customer.save()
-            request.user.balance += DELIVERY_AMOUNT
-            request.user.save()
-            if not delivery.carts.exists():
-                return Response('There is nothing in the cart', status=400)
-            org_user = delivery.carts.first().product.organization.user
-            org_user.balance += (amount - DELIVERY_AMOUNT)
-            org_user.save()
-            ser.save()
-            return Response(status=201)
-        else:
-            return Response('Not enough money on the balance', status=400)
+        return Response(status=201)
 
 
     def list(self, request):
@@ -87,7 +82,17 @@ class CartViewSet(viewsets.ViewSet):
 @api_view(['GET'])
 def activate_view(request, activation_code):
     delivery = get_object_or_404(Delivery, activation_code=activation_code)
-    delivery.activation_code = None
-    delivery.save()
 
-    return Response('Exellent, The order is confirmed!', status=200)
+    amount = round(sum(delivery.price.values()), 2)
+    print('Цена', amount) 
+    customer = delivery.customer
+
+    if customer.balance >= amount:
+        customer.balance -= amount
+        customer.save()    
+        delivery.activation_code = None
+        delivery.save()
+
+        return Response('Excellent, The order is confirmed!', status=200)
+    else:
+        return Response('Not enough money on the balance', status=400)

@@ -19,12 +19,14 @@ class DeliverySerializer(serializers.ModelSerializer):
     
 
     def to_representation(self, instance):
-        # print(instance.carts.delivery)
-        rep = super().to_representation(instance)
-        rep['cart'] = CartSerializer(instance.carts.all(), many=True).data
-        rep['total'] = instance.amount
+        if not instance.activation_code or not instance.deliveryman:
+            rep = super().to_representation(instance)
+            rep['cart'] = CartSerializer(instance.carts.all(), many=True).data
+            rep['price'] = instance.price
 
-        return rep
+            return rep
+        
+        return f'Заказ {instance.id} недоступен.'
 
 
     def create(self, validated_data):

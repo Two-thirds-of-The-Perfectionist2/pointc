@@ -1,4 +1,7 @@
+from decimal import Decimal
 from django.contrib.gis.db import models
+from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.measure import D
 from django.contrib.auth import get_user_model
 
 from main.models import Product
@@ -28,12 +31,21 @@ class Delivery(models.Model):
 
     @property
     def price(self):
-        carts =  self.carts.all()
-        prices = sum([i.product.price for i in carts])
-        DELIVERY_AMOUNT = 100
-        total = prices + DELIVERY_AMOUNT
+        carts = self.carts.all()
+        products = sum([i.product.price for i in carts])
+        
+        query = Delivery.objects.annotate(distance=Distance('location', self.carts.first().product.organization.location)).filter(id=self.id).first()
 
-        return total
+        print(query.distance)
+        
+        if query.distance < D(m=3000):
+            delivery = products * Decimal(0.05)
+        elif query.distance < D(m=12000):
+            delivery = products * Decimal(0.15)
+        else:
+            raise Exception('Не удалось подтвердить Ваш заказ: расстояние превышает допустимое.')
+        
+        return {'products': products, 'delivery': delivery}
 
 
 class Cart(models.Model):

@@ -27,7 +27,7 @@ class RegisterUserView(APIView):
         return Response('Successfully registration')
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 def resend_activation_code(request):
     email = request.query_params.get('email')
     user = get_object_or_404(User, email=email)
@@ -119,6 +119,9 @@ def rating(request, id=None):
 @swagger_auto_schema(request_body=UserBalanceSerializer, method='PATCH')
 @api_view(['PATCH'])
 def add_balance(request):
+    if not request.user.is_authenticated:
+        raise NotAuthenticated()
+    
     ser = UserBalanceSerializer(data=request.data, context={'request': request})
     ser.is_valid(raise_exception=True)
 
@@ -126,7 +129,7 @@ def add_balance(request):
     user.balance += Decimal(request.data.get('balance'))
     user.save()
 
-    return Response(status=201)
+    return Response(f'Баланс {user} был успешно пополнен на {request.data.get("balance")}', status=201)
 
 
 @api_view(['GET'])

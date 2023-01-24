@@ -71,7 +71,7 @@ class OrginizationViewSet(ModelViewSet):
     
 
     @action(['POST'], detail=True)
-    def subs(self, request, pk=None):
+    def subscribe(self, request, pk=None):
         if not request.user.is_authenticated:
             raise NotAuthenticated
 
