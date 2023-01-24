@@ -1,3 +1,4 @@
+from decouple import config
 from rest_framework import serializers
 
 from .models import *
@@ -90,10 +91,7 @@ class ProductFavoriteSerializer(serializers.ModelSerializer):
 
 
     def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        rep['organization'] = instance.product.organization.title
-        rep['title'] = instance.product.title
-        rep['price'] = instance.product.price
-        rep['cover'] = ProductSerializer(instance.product).data.get('cover')
+        rep = ProductSerializer(instance.product).data
+        rep['cover'] = f"http://{config('CURRENT_HOST') + rep.get('cover')}"
 
         return rep
