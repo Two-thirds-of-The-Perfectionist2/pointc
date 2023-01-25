@@ -130,15 +130,15 @@ class ProductViewSet(ModelViewSet):
         self.check_permissions(request)
         self.check_object_permissions(request=request, obj=get_object_or_404(Organization, id=organization_pk))
         # if request.data.get('organization'):
-        #     raise NotAcceptable(detail='Field "organization" not available for update')
-
+            # raise NotAcceptable(detail='Field "organization" not available for update')
+            
         if type(request.data) == QueryDict:
             request.data._mutable = True
         
         request.data.update({'organization': organization_pk})
 
         return super().update(request, *args, **kwargs)
-    
+
 
     @action(['PUT'], detail=True)
     def favorite(self, request, pk=None, *args, **kwargs):

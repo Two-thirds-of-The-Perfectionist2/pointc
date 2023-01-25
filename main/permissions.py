@@ -31,4 +31,3 @@ class IsOrganizationOrReadOnly(BasePermission):
         if not request.user.is_authenticated:
             return False
         return True
- 

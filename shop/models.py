@@ -48,7 +48,7 @@ class Delivery(models.Model):
             
             return {'products': products, 'delivery': delivery}
         else:
-            return {'products': products, 'delivery': 100.0}
+            return {'products': products, 'delivery': Decimal(100.0)}
 
 
 class Cart(models.Model):
