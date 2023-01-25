@@ -122,10 +122,13 @@ def rating(request, id=None):
     
 
 @swagger_auto_schema(request_body=UserBalanceSerializer, method='PATCH')
-@api_view(['PATCH'])
+@api_view(['GET', 'PATCH'])
 def add_balance(request):
     if not request.user.is_authenticated:
         raise NotAuthenticated()
+
+    if request.method == 'GET':
+        return Response(f'Баланс {request.user} составляет {request.user.balance}', status=200)
     
     ser = UserBalanceSerializer(data=request.data, context={'request': request})
     ser.is_valid(raise_exception=True)

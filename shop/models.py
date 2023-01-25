@@ -3,6 +3,7 @@ from django.contrib.gis.db import models
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.contrib.auth import get_user_model
+from rest_framework.exceptions import ParseError
 
 from main.models import Product
 
@@ -19,6 +20,7 @@ class Delivery(models.Model):
     customer = models.ForeignKey(User, related_name='customers', on_delete=models.CASCADE)
     deliveryman = models.ForeignKey(User, related_name='deliveries', on_delete=models.CASCADE, null=True)
     activation_code = models.CharField(max_length=8, null=True)
+    is_done = models.BooleanField(default=False)
 
 
     def create_activation_code(self):
@@ -34,16 +36,19 @@ class Delivery(models.Model):
         carts = self.carts.all()
         products = sum([i.product.price for i in carts])
         
-        query = Delivery.objects.annotate(distance=Distance('location', self.carts.first().product.organization.location)).filter(id=self.id).first()
-        
-        if query.distance < D(m=3000):
-            delivery = products * Decimal(0.05)
-        elif query.distance < D(m=12000):
-            delivery = products * Decimal(0.15)
+        if self.location and self.carts.first().product.organization.location:
+            query = Delivery.objects.annotate(distance=Distance('location', self.carts.first().product.organization.location)).filter(id=self.id).first()
+            
+            if query.distance < D(m=3000):
+                delivery = products * Decimal(0.05)
+            elif query.distance < D(m=12000):
+                delivery = products * Decimal(0.15)
+            else:
+                raise ParseError('Не удалось подтвердить заказ: расстояние превышает допустимое.')
+            
+            return {'products': products, 'delivery': delivery}
         else:
-            raise Exception('Не удалось подтвердить Ваш заказ: расстояние превышает допустимое.')
-        
-        return {'products': products, 'delivery': delivery}
+            return {'products': products, 'delivery': 100.0}
 
 
 class Cart(models.Model):

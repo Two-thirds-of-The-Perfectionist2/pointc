@@ -21,7 +21,7 @@ class DeliverySerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         request = self.context.get('request')
 
-        if not instance.deliveryman or instance.deliveryman == request.user:
+        if not instance.deliveryman or request.user == instance.deliveryman:
             rep = super().to_representation(instance)
             rep['title organization'] = instance.carts.first().product.organization.title
             rep['title product'] = instance.carts.first().product.title

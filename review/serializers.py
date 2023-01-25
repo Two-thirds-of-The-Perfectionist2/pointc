@@ -92,6 +92,6 @@ class ProductFavoriteSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         rep = ProductSerializer(instance.product).data
-        rep['cover'] = f"http://{config('CURRENT_HOST')}{ProductSerializer(instance.product).data.get('cover')}"
+        rep['cover'] = f"http://{config('CURRENT_HOST') + rep.get('cover')}"
 
         return rep

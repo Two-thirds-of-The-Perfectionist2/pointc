@@ -5,7 +5,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.decorators import api_view
-from rest_framework.exceptions import NotAcceptable
+from rest_framework.exceptions import NotAcceptable, ParseError
 from drf_yasg.utils import swagger_auto_schema
 
 from .tasks import send_confirmation_code
@@ -82,6 +82,10 @@ class CartViewSet(viewsets.ViewSet):
 @api_view(['GET'])
 def activate_view(request, activation_code):
     delivery = get_object_or_404(Delivery, activation_code=activation_code)
+    
+    if not delivery.carts.first():
+        raise ParseError('Не удалось подтвердить заказ: корзина пуста.')
+
     amount = round(sum(delivery.price.values()), 2)
     customer = delivery.customer
 
@@ -94,3 +98,12 @@ def activate_view(request, activation_code):
         return Response('Excellent, The order is confirmed!', status=200)
     else:
         return Response('Not enough money on the balance', status=400)
+
+
+@api_view(['PATCH'])
+def order_done(request, id):
+    delivery = get_object_or_404(Delivery,id=id)
+    delivery.is_done = True
+    delivery.save()
+    return Response(status=201)
+

@@ -26,7 +26,7 @@ from shop.serializers import DeliverySerializer, CartSerializer
 User = get_user_model()
 
 
-class OrginizationViewSet(ModelViewSet):
+class OrganizationViewSet(ModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
     filterset_class = OrganizationFilter
@@ -92,20 +92,31 @@ class OrginizationViewSet(ModelViewSet):
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [IsOrganizationOrReadOnly]
     
-    @method_decorator(cache_page(60 * 15))
+    @method_decorator(cache_page(60 * 1))
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('q', openapi.IN_QUERY, type=openapi.TYPE_STRING),
+    ])
     def list(self, request, *args, **kwargs):
+        q = request.query_params.get('q')
+
+        if q:
+            products = Product.objects.filter(title__icontains=q)
+            result = ProductSerializer(products, many=True).data
+            paginated_result = PageNumberPagination().paginate_queryset(result, request)
+
+            return Response(paginated_result, status=200)
+        
         return super().list(request, *args, **kwargs)
 
     def get_queryset(self):
         return Product.objects.filter(organization=self.kwargs['organization_pk'])
 
 
-    def get_permissions(self):
-        return [IsOrganizationOrReadOnly()]
-
-
     def create(self, request, organization_pk, *args, **kwargs):
+        self.check_permissions(request)
+        self.check_object_permissions(request=request, obj=get_object_or_404(Organization, id=organization_pk))
         if type(request.data) == QueryDict:
             request.data._mutable = True
         
@@ -115,6 +126,9 @@ class ProductViewSet(ModelViewSet):
     
 
     def update(self, request, organization_pk, *args, **kwargs):
+
+        self.check_permissions(request)
+        self.check_object_permissions(request=request, obj=get_object_or_404(Organization, id=organization_pk))
         # if request.data.get('organization'):
         #     raise NotAcceptable(detail='Field "organization" not available for update')
 
@@ -211,12 +225,15 @@ def recommendation(request):
 def support_bot(request):
     q = request.query_params.get('q')
     
+    questions = ('question 1', 'question 2', 'question 3', 'question 4')
+    answers = ('answer 1', 'answer 2', 'answer 3', 'answer 4')
+
     if not q:
-        raise NotFound('Missing query parameters.')
+        return Response(questions)
     
-    response = {'1': OrganizationSerializer(Organization.objects.all(), many=True).data,
-                '2': ProductSerializer(Product.objects.all(), many=True).data,
-                'как вернуть деньги?': 'Эй, кыргызча суйло',
-                '4': 'question 4'}
-    
-    return Response(response.get(q), status=200)
+    try:
+        answer = answers[int(q)-1]
+    except (ValueError, IndexError):
+        return Response('Параметр введен неверно.', status=400)
+
+    return Response(answer, status=200)
