@@ -31,8 +31,8 @@ class CommentViewSet(viewsets.ModelViewSet):
      
 
     def update(self, request, organization_pk, *args, **kwargs):
-        if request.data.get('organization'):
-            raise NotAcceptable(detail='Field "organization" not available for update')
+        # if request.data.get('organization'):
+        #     raise NotAcceptable(detail='Field "organization" not available for update')
 
         if type(request.data) == QueryDict:
             request.data._mutable = True
