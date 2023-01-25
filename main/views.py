@@ -26,7 +26,7 @@ from shop.serializers import DeliverySerializer, CartSerializer
 User = get_user_model()
 
 
-class OrginizationViewSet(ModelViewSet):
+class OrganizationViewSet(ModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
     filterset_class = OrganizationFilter
@@ -92,6 +92,7 @@ class OrginizationViewSet(ModelViewSet):
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [IsOrganizationOrReadOnly]
     
     @method_decorator(cache_page(60 * 15))
     def list(self, request, *args, **kwargs):
@@ -101,11 +102,9 @@ class ProductViewSet(ModelViewSet):
         return Product.objects.filter(organization=self.kwargs['organization_pk'])
 
 
-    def get_permissions(self):
-        return [IsOrganizationOrReadOnly()]
-
-
     def create(self, request, organization_pk, *args, **kwargs):
+        self.check_permissions(request)
+        self.check_object_permissions(request=request, obj=get_object_or_404(Organization, id=organization_pk))
         if type(request.data) == QueryDict:
             request.data._mutable = True
         
@@ -115,6 +114,8 @@ class ProductViewSet(ModelViewSet):
     
 
     def update(self, request, organization_pk, *args, **kwargs):
+        self.check_permissions(request)
+        self.check_object_permissions(request=request, obj=get_object_or_404(Organization, id=organization_pk))
         if request.data.get('organization'):
             raise NotAcceptable(detail='Field "organization" not available for update')
 

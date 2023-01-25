@@ -20,6 +20,7 @@ class Delivery(models.Model):
     customer = models.ForeignKey(User, related_name='customers', on_delete=models.CASCADE)
     deliveryman = models.ForeignKey(User, related_name='deliveries', on_delete=models.CASCADE, null=True)
     activation_code = models.CharField(max_length=8, null=True)
+    is_done = models.BooleanField(default=False)
 
 
     def create_activation_code(self):

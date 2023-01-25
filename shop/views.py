@@ -98,3 +98,12 @@ def activate_view(request, activation_code):
         return Response('Excellent, The order is confirmed!', status=200)
     else:
         return Response('Not enough money on the balance', status=400)
+
+
+@api_view(['PATCH'])
+def order_done(request, id):
+    delivery = get_object_or_404(Delivery,id=id)
+    delivery.is_done = True
+    delivery.save()
+    return Response(status=201)
+
