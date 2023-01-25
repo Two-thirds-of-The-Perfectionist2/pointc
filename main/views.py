@@ -95,7 +95,19 @@ class ProductViewSet(ModelViewSet):
     permission_classes = [IsOrganizationOrReadOnly]
     
     @method_decorator(cache_page(60 * 1))
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('q', openapi.IN_QUERY, type=openapi.TYPE_STRING),
+    ])
     def list(self, request, *args, **kwargs):
+        q = request.query_params.get('q')
+
+        if q:
+            products = Product.objects.filter(title__icontains=q)
+            result = ProductSerializer(products, many=True).data
+            paginated_result = PageNumberPagination().paginate_queryset(result, request)
+
+            return Response(paginated_result, status=200)
+        
         return super().list(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -114,11 +126,12 @@ class ProductViewSet(ModelViewSet):
     
 
     def update(self, request, organization_pk, *args, **kwargs):
+
         self.check_permissions(request)
         self.check_object_permissions(request=request, obj=get_object_or_404(Organization, id=organization_pk))
         # if request.data.get('organization'):
             # raise NotAcceptable(detail='Field "organization" not available for update')
-
+            
         if type(request.data) == QueryDict:
             request.data._mutable = True
         
