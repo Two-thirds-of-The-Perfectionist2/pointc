@@ -94,7 +94,7 @@ class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
     permission_classes = [IsOrganizationOrReadOnly]
     
-    @method_decorator(cache_page(60 * 15))
+    @method_decorator(cache_page(60 * 1))
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
@@ -212,12 +212,15 @@ def recommendation(request):
 def support_bot(request):
     q = request.query_params.get('q')
     
+    questions = ('question 1', 'question 2', 'question 3', 'question 4')
+    answers = ('answer 1', 'answer 2', 'answer 3', 'answer 4')
+
     if not q:
-        raise NotFound('Missing query parameters.')
+        return Response(questions)
     
-    response = {'1': OrganizationSerializer(Organization.objects.all(), many=True).data,
-                '2': ProductSerializer(Product.objects.all(), many=True).data,
-                'как вернуть деньги?': 'Эй, кыргызча суйло',
-                '4': 'question 4'}
-    
-    return Response(response.get(q), status=200)
+    try:
+        answer = answers[int(q)-1]
+    except (ValueError, IndexError):
+        return Response('Параметр введен неверно.', status=400)
+
+    return Response(answer, status=200)
