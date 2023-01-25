@@ -2,5 +2,5 @@ venv/
 __pycache__/
 media/
 static/
-django-cache/
+django_cache/
 .env
