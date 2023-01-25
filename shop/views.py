@@ -11,6 +11,7 @@ from drf_yasg.utils import swagger_auto_schema
 from .tasks import send_confirmation_code
 from .models import Delivery, Cart
 from .serializers import DeliverySerializer, CartSerializer, DeliveryManSerializer
+from .utils import chatroom, roomname
 
 
 User = get_user_model()
@@ -95,7 +96,7 @@ def activate_view(request, activation_code):
         delivery.activation_code = None
         delivery.save()
 
-        return Response('Excellent, The order is confirmed!', status=200)
+        return Response(f'Excellent, The order is confirmed! Enter chat with courier: {chatroom(roomname(), customer)}', status=200)
     else:
         return Response('Not enough money on the balance', status=400)
 
@@ -106,4 +107,3 @@ def order_done(request, id):
     delivery.is_done = True
     delivery.save()
     return Response(status=201)
-
