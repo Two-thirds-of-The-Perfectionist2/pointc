@@ -1,3 +1,4 @@
+from decouple import config
 from rest_framework.serializers import ModelSerializer
 
 from .models import Organization, Product
@@ -23,6 +24,7 @@ class OrganizationSerializer(ModelSerializer):
         rep['likes'] = instance.likes.count()
         rep['products'] = ProductSerializer(instance.products.all(), many=True).data
         rep['subscribers'] = instance.subscriptions.count()
+        rep['cover'] = f"http://{config('CURRENT_HOST')}/media/{instance.cover}"
 
         return rep
 
@@ -36,6 +38,7 @@ class ProductSerializer(ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         rep['organization'] = instance.organization.title
+        rep['cover'] = f"http://{config('CURRENT_HOST')}/media/{instance.cover}"
 
         return rep
     
