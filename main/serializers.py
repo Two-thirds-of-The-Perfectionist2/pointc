@@ -33,6 +33,14 @@ class ProductSerializer(ModelSerializer):
         fields = '__all__'
     
 
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['organization'] = instance.organization.title
+
+        return rep
+    
+    
+
 class SubscriptionSerializer(ModelSerializer):
 
     class Meta:
